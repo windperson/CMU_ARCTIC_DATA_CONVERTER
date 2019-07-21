@@ -3,8 +3,8 @@
 param(
     [String]$sourceScript,
     [String]$targetScript,
-    [String]$sourceWav,
-    [String]$targetWav
+    [String]$wavSource,
+    [String]$wavTarget
 )
 
 $line_pattern = '^\(\s(?<file_name>[\w]+)\s(?<content>\"[\w\s.,]+\")\s\)$'
@@ -19,7 +19,13 @@ Write-Output "There are total $data_count samples."
 $scriptContent |
 ForEach-Object -Begin { $curIndex = 1; } -Process {
     if ( $_ -match $line_pattern) {
-      Add-Content -Path $targetScript -Value "$($curIndex.ToString($file_fomratter))`t$($Matches.content)\r\n";
+        $wavNewName = $curIndex.ToString($file_fomratter);
+        $sourcePath = Join-Path -Path $wavSource -ChildPath "$($Matches.file_name).wav";
+        $targetPath = Join-Path -Path $wavTarget -ChildPath "$wavNewName.wav";
+        New-Item -ItemType File -Path $targetPath -Force | Out-Null;
+        Copy-Item -Path $sourcePath -Destination $targetPath;
+        Add-Content -Path $targetScript -Value "$wavNewName`t$($Matches.content)";
     }; $curIndex++; };
 
-Write-Output "Correct script file is $targetScript."
+Write-Output "Output script file is $(Resolve-Path $targetScript)"
+Write-Output "Output wav file path is $(Resolve-Path $wavTarget)`r`nDone."
