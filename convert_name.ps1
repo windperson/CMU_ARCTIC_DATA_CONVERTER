@@ -7,7 +7,7 @@ param(
     [String]$wavTarget
 )
 
-$line_pattern = '^\(\s(?<file_name>[\w]+)\s(?<content>\"[\w\s.,]+\")\s\)$'
+$line_pattern = "^\(\s(?<file_name>[\w]+)\s(?<content>\`"[\w\s.,;\'-]+\`")\s\)$"
 
 $scriptContent = Get-Content -Path $sourceScript;
 
@@ -25,13 +25,16 @@ ForEach-Object -Begin { $curIndex = 1; } -Process {
         New-Item -ItemType File -Path $targetPath -Force | Out-Null;
         Copy-Item -Path $sourcePath -Destination $targetPath;
         Add-Content -Path $targetScript -Value "$wavNewName`t$($Matches.content)";
+    } else {
+      Write-Output "Cannot process the $curIndex th item.";
     };
     $curIndex++;
 };
 
 $outputWavZipPath = Join-Path -Path $wavTarget -ChildPath '../wav.zip';
 
-Compress-Archive -Path "$(Join-Path -Path $wavTarget -ChildPath '*.wav')" -DestinationPath $outputWavZipPath;
+Write-Output "Produce resulting zip file..."
+Compress-Archive -Force -Path "$(Join-Path -Path $wavTarget -ChildPath '*.wav')" -DestinationPath $outputWavZipPath;
 
 Write-Output "Output script file is $(Resolve-Path $targetScript)"
 Write-Output "Output wav file path is $(Resolve-Path $outputWavZipPath)`r`nDone."
