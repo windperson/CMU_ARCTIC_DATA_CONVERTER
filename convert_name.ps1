@@ -25,7 +25,13 @@ ForEach-Object -Begin { $curIndex = 1; } -Process {
         New-Item -ItemType File -Path $targetPath -Force | Out-Null;
         Copy-Item -Path $sourcePath -Destination $targetPath;
         Add-Content -Path $targetScript -Value "$wavNewName`t$($Matches.content)";
-    }; $curIndex++; };
+    };
+    $curIndex++;
+};
+
+$outputWavZipPath = Join-Path -Path $wavTarget -ChildPath '../wav.zip';
+
+Compress-Archive -Path "$(Join-Path -Path $wavTarget -ChildPath '*.wav')" -DestinationPath $outputWavZipPath;
 
 Write-Output "Output script file is $(Resolve-Path $targetScript)"
-Write-Output "Output wav file path is $(Resolve-Path $wavTarget)`r`nDone."
+Write-Output "Output wav file path is $(Resolve-Path $outputWavZipPath)`r`nDone."
