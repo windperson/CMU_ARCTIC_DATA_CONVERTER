@@ -9,3 +9,4 @@ Invoke the script like the following, if you extract the CMU arctic speech data 
 ```
 
 The output folder will contain the resulting `script.txt` & `wav.zip` files, that are acceptable input training data that you can upload to Azure Custom Voice portal.
+![screen shot](./doc/screen_shot.png)
